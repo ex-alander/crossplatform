@@ -15,8 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="algolang_lab_0.cpp">
+    <ClCompile Include="OS_lab5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Day.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Other functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Day.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Other functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

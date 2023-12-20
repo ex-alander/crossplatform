@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{236b5daf-f892-4db1-ba6a-5c391a5e5f15}</ProjectGuid>
-    <RootNamespace>algolanglab0</RootNamespace>
+    <ProjectGuid>{87816310-7e51-496a-bb6f-c1629870b834}</ProjectGuid>
+    <RootNamespace>anothertry</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="algolang_lab_0.cpp" />
+    <ClCompile Include="another try.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
