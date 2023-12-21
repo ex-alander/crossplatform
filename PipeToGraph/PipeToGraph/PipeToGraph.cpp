@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <stack>
 /*
 deleting from graph
@@ -37,13 +38,32 @@ void PrintMap(map <int, T> a)
         PDivider();
     }
 }
+template<typename T>
+int whereabouts(map<int, T>a, T t)
+{
+    for (auto itr = a.begin();itr != a.end();itr++)
+    {
+        if (itr->second == t) return itr->first;
+    }
+    return -1;
+}
+ostream& operator << (ostream& out, vector<int>& adj)
+{
+    for (auto& itr : adj)
+    {
+        out << itr << ' ';
+    }
+    return out;
+}
 class net
 {
 public:
     class CS
     {
-
+    private:
+        static int all_id;
     public:
+        int id;
         bool operator == (const net::CS& cs2)
         {
             return this->name == cs2.name
@@ -53,30 +73,20 @@ public:
         }
         string name;
         int wksh_num, active, eff;
-        vector <net::CS> adj;
-        CS()
-        {
-            name = "0";
-            wksh_num = 0;
-            active = 0;
-            eff = 0;
-        }
+        CS();
+        
         bool exist()
         {
             return this->name[0] - '0';
         }
-        void printAdjacents()
-        {
-            cout << "Vertex " << this->name << "'s adjacency list: ";
-            for (auto i : this->adj)
-            {
-                cout << i.name << ' ';
-            }
-            cout << "\n";
-        }
     };
+    unordered_map<int, vector<net::CS>>adj;
+    void printAdjList(net::CS cs)
+    {
+        for (auto& i : this->adj[cs.id]) cout << i.name << " ";
+        //cout << '\n';
+    }
 private:
-
     vector<net::CS>visited;
     bool isVisited(net::CS a)
     {
@@ -89,24 +99,11 @@ private:
     void topsort_action(net::CS cs, vector<net::CS>& visited, stack<net::CS>& stack)
     { // we'll update our vertices stack
         visited.push_back(cs); // mark that we've gone through the vertex
-        cs.printAdjacents();
-        //if (cs.name == "cs3")
-        //{
-        //    cout << cs.adj[0].name << endl;
-        //}
-        for (auto& i : cs.adj) 
+        for (auto& i : this->adj[cs.id])
         { // iterate through all adjacent vertices
             if (!isVisited(i))
             {
-                /*if (i.name == "cs3")
-                {
-                    cout << i.adj[0].name << "100" << endl;
-                }*/
                 topsort_action(i, visited, stack);
-                /*if (i.name == "cs3")
-                {
-                    cout << i.adj[0].name << "100" << endl;
-                }*/
             }
         }
         stack.push(cs);
@@ -150,39 +147,9 @@ public:
             if (state == "Ready for exploitation") state = "Under maintenance";
             else state = "Ready for exploitation";
         }
-        void connect(CS& a, CS& b)
-        {
-            if (!a.exist() or !b.exist())
-            {
-                cout << "ERROR: object(s) not found\n";
-                return;
-            }
-            if (a == b)
-            {
-                cout << "Connecting a CS to iteslf? Genius. \n";
-            }
-            else
-            {
-                start = a;
-                end = b;
-                a.adj.push_back(b);
-                cout << "CS's connected successfully\n";
-                cout << "the start of the new edge is " << this->start.name << '\n'
-                    << "and the end of it is " << this->end.name << '\n';
-                cout << '\n' << "now its adj list is: ";
-                for (int i = 0; i < a.adj.size(); i++) cout << a.adj[i].name << " ";
-                cout << "\n\n";
-            }
-        }
-        void disconnect()
-        {
-            start = end = nullCS;
-            //start.pop(end);
-        }
     };
     void topsort(map<int, net::CS> css)
     {
-        PrintMap(css);
         stack<net::CS> stack;
         for (auto& itr : css) 
         {
@@ -197,7 +164,51 @@ public:
             stack.pop();
         }
     }
+    void connect(map<int, net::CS>css, net::CS& a, net::CS& b, net::Pipe& p)
+    {
+        if (!a.exist() or !b.exist())
+        {
+            cout << "ERROR: object(s) not found\n";
+            return;
+        }
+        if (a == b)
+        {
+            cout << "Connecting a CS to iteslf? Genius. \n";
+        }
+        else
+        {
+            p.start = a;
+            p.end = b;
+            int i = whereabouts(css, a);
+            this->adj[i].push_back(b);
+            cout << "CS's connected successfully\n";
+        }
+    }
+    void printAdjMatrix(map<int,net::CS>css)
+    {
+        if (this->adj.empty())
+        {
+            cout << "The adjacency matrix is empty" << '\n';
+            return;
+        }
+        for (auto& itr : this->adj)
+        {
+            cout << "Vertex " << css[itr.first].name << "'s adjacency list: ";
+            for (auto& i : this->adj[itr.first]) cout << i.name << " ";
+            cout << '\n';
+        }
+    }
 };
+int net::CS::all_id = -2;
+net::CS::CS()
+{
+    name = "0";
+    wksh_num = 0;
+    active = 0;
+    eff = 0;
+    id = all_id;
+    all_id++;
+}
 ostream& operator << (ostream& out, net::Pipe& a)
 {
     out << "Name:                      " << a.name << endl
@@ -206,21 +217,12 @@ ostream& operator << (ostream& out, net::Pipe& a)
         << "State:                     " << a.state << endl;
     return out;
 }
-ostream& operator << (ostream& out, vector<net::CS>& adj)
-{
-    for (auto& itr : adj)
-    {
-        out << itr.name << ' ';
-    }
-    return out;
-}
 ostream& operator << (ostream& out, net::CS& b)
 {
     out << "Name:                      " << b.name << endl
         << "Workshops number:          " << b.wksh_num << endl
         << "Active workshops number:   " << b.active << endl
-        << "Efficiency (0-5):          " << b.eff << endl
-        << "Adjacency list:            " << b.adj;
+        << "Efficiency (0-5):          " << b.eff;
     return out;
 }
 ostream& operator << (ostream& out, stack<net::CS>& st)
@@ -236,13 +238,13 @@ ostream& operator << (ostream& out, stack<net::CS>& st)
 int main()
 {
     net net;
-    net::CS cs;
     net::Pipe pipe;
     map<int, net::CS>css;
     map<int, net::Pipe>pipes;
 
-    for (int i = 1; i<=5; i++)
+    for (int i = 1; i <= 5; i++)
     {
+        net::CS cs;
         css.insert(pair<int, net::CS>(i, cs));
         css[i].name = { 'c','s', {(char)(i + 48)} };
     }
@@ -255,25 +257,10 @@ int main()
     pipes[1].connect(css[5], css[2]);
     pipes[0].connect(css[5], css[3]);
     pipes[2].connect(css[1], css[4]);*/
-    pipes[0].connect(css[4], css[5]);
-    pipes[1].connect(css[4], css[3]);
-    pipes[2].connect(css[1], css[3]);
-    pipes[3].connect(css[3], css[2]);
-    PrintMap(css);
+    net.connect(css, css[1], css[4], pipes[0]);
+    net.connect(css, css[5], css[3], pipes[1]);
+    net.connect(css, css[4], css[3], pipes[2]);
+    net.connect(css, css[3], css[2], pipes[3]);
+    net.connect(css, css[5], css[2], pipes[4]);
     net.topsort(css);
-
-
-
-
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
